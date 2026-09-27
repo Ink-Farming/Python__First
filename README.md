@@ -23,20 +23,23 @@ python__First
 │   │       ├── S1E17.py
 │   │       ├── S1E18.py
 │   │       ├── S1E19.py
-│   │       └── S1E30_1.py
+│   │       ├── S1E20.py
+│   │       ├── S1E21.py
+│   │       ├── S1E27.py
+│   │       ├── S1E28.py
+│   │       ├── S1E29_0.py
+│   │       ├── S1E29_1.py
+│   │       ├── S1E29_2.py
+│   │       ├── S1E29_3.py
+│   │       ├── S1E29_4.py
+│   │       ├── S1E30_0.py
+│   │       ├── S1E30_1.py
+│   │       ├── S1E30_1_2.py
+│   │       ├── S1E30_2.py
+│   │       └── S1E30_2_1.py
 │   ├── Test
 │   │     └── S1midterm.txt
 │   ├── BaiduStar_01_Discount.py        #百度之星测试题其3
-│   ├── S1E20.py
-│   ├── S1E21.py
-│   ├── S1E27.py
-│   ├── S1E28.py
-│   ├── S1E29_0.py
-│   ├── S1E29_1.py
-│   ├── S1E29_2.py
-│   ├── S1E29_3.py
-│   ├── S1E29_4.py
-│   ├── S1E30_0.py
 │   ├── S1E30_1.py
 │   ├── address_book.py                 #函数封装的基础练习
 │   ├── control_flow_exercises.py       #控制流语法练习
