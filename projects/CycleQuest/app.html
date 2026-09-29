@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任务成就系统</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #f5f5f7; color: #1d1d1f;
+  padding: 20px; max-width: 520px; margin: 0 auto;
+}
+
+/* 顶部标签切换 */
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  background: #e5e5ea;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #86868b;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.tab-btn.active {
+  background: #fff;
+  color: #1d1d1f;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* 视图容器 */
+.view { display: none; }
+.view.active { display: block; }
+
+.header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; }
+.header-left .date { font-size:13px; color:#86868b; margin-bottom:2px; }
+.header-left .title { font-size:22px; font-weight:600; }
+.header-right { text-align:right; }
+.header-right .num { font-size:32px; font-weight:600; line-height:1; }
+.header-right .label { font-size:12px; color:#86868b; margin-top:2px; }
+
+/* 进度条区域 */
+.progress-area { margin-bottom: 20px; }
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.progress-percent {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+.progress-fraction {
+  font-size: 12px;
+  color: #86868b;
+}
+.progress-wrap { width:100%; height:8px; background:#e5e5ea; border-radius:4px; overflow:hidden; }
+.progress-bar { height:100%; border-radius:4px; width:0%; transition:width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.progress-bar.daily { background: linear-gradient(90deg, #1d1d1f, #434343); }
+.progress-bar.weekly { background: linear-gradient(90deg, #007aff, #5ac8fa); }
+.progress-bar.monthly { background: linear-gradient(90deg, #af52de, #ff2d55); }
+
+.task-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+.task-row {
+  display:flex; align-items:center; gap:12px;
+  padding:14px; background:#fff; border-radius:12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: transform 0.15s ease;
+}
+.task-row:hover { transform: translateY(-1px); }
+.checkbox {
+  width:22px; height:22px; border-radius:6px;
+  border:2px solid #c7c7cc; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:all 0.2s ease;
+}
+.checkbox.done { background:#34c759; border-color:#34c759; }
+.checkbox svg { display:none; }
+.checkbox.done svg { display:block; }
+.task-text { flex:1; font-size:15px; transition:all 0.2s; }
+.task-text.done { color:#86868b; text-decoration:line-through; }
+.delete-btn {
+  width:28px; height:28px; border:none; background:transparent;
+  color:#c7c7cc; cursor:pointer; border-radius:6px; display:flex;
+  align-items:center; justify-content:center; opacity:0; transition:all 0.2s;
+}
+.task-row:hover .delete-btn { opacity:1; }
+.delete-btn:hover { color:#ff3b30; background:#ffe5e5; }
+.input-wrap { display:flex; gap:8px; }
+.input-wrap input {
+  flex:1; padding:12px 14px; border:1px solid #d1d1d6; border-radius:10px;
+  font-size:14px; outline:none; background:#fff;
+}
+.input-wrap input:focus { border-color:#1d1d1f; }
+.input-wrap button {
+  padding:12px 18px; border:none; border-radius:10px;
+  background:#1d1d1f; color:#fff; font-size:14px; font-weight:500;
+  cursor:pointer; transition:opacity 0.2s;
+}
+.input-wrap button:hover { opacity:0.85; }
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #c7c7cc;
+  font-size: 14px;
+}
+
+/* Toast 弹窗 */
+#toastContainer {
+  position: fixed; bottom: 24px; left: 24px;
+  display: flex; flex-direction: column; gap: 10px;
+  pointer-events: none; z-index: 9999;
+}
+.toast {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid #3a3a5a;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  min-width: 300px; max-width: 380px;
+  transform: translateX(-120%); opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  pointer-events: auto;
+}
+.toast.show { transform: translateX(0); opacity: 1; }
+.toast.gold { border-color: #ffd700; }
+.toast-icon { flex-shrink: 0; }
+.toast-title {
+  font-size: 11px; color: #a0a0b0;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+.toast-name {
+  font-size: 15px; font-weight: 600; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.toast-desc {
+  font-size: 12px; color: #b0b0c0; margin-top: 3px;
+}
+
+/* ========== 历史面板 ========== */
+#historyOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px); z-index: 2000;
+  display: none; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+#historyOverlay.show { display: flex; opacity: 1; }
+#historyPanel {
+  background: #fff; border-radius: 16px; width: 90%; max-width: 420px;
+  max-height: 70vh; display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  transform: scale(0.92); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#historyOverlay.show #historyPanel { transform: scale(1); }
+.history-header {
+  padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.history-header h3 { font-size: 16px; font-weight: 600; }
+.history-header .close-x {
+  width: 28px; height: 28px; border-radius: 8px; border: none;
+  background: #f5f5f7; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; font-size: 16px; color: #86868b;
+}
+.history-list {
+  overflow-y: auto; padding: 8px 16px 16px;
+}
+.history-item {
+  padding: 12px 14px; border-radius: 10px; margin-top: 8px;
+  background: #f5f5f7; cursor: pointer; transition: background 0.2s;
+}
+.history-item:hover { background: #ebebf0; }
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.history-item-date { font-size: 14px; font-weight: 600; }
+.history-item-rate {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #e5e5ea;
+  color: #1d1d1f;
+}
+.history-item-rate.done { background: #d4f8d4; color: #1d7a1d; }
+.history-bar-wrap { width: 100%; height: 4px; background: #e5e5ea; border-radius: 2px; overflow: hidden; }
+.history-bar { height: 100%; border-radius: 2px; background: #34c759; width: 0%; transition: width 0.4s ease; }
+.history-detail {
+  margin-top: 10px; padding-top: 10px; border-top: 1px dashed #d1d1d6;
+  display: none;
+}
+.history-detail.open { display: block; }
+.history-task {
+  font-size: 13px; color: #555; padding: 3px 0;
+  display: flex; align-items: center; gap: 6px;
+}
+.history-task.done { color: #86868b; text-decoration: line-through; }
+.history-empty {
+  text-align: center; padding: 40px 20px; color: #c7c7cc; font-size: 14px;
+}
+
+/* 底部工具栏 */
+#bottomBar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #f5f5f7; border-top: 1px solid #d1d1d6;
+  padding: 8px 16px; display: flex; gap: 6px;
+  justify-content: center; align-items: center; z-index: 100;
+}
+#bottomBar button {
+  padding: 6px 12px; border: 1px solid #c7c7cc; border-radius: 8px;
+  background: #fff; cursor: pointer; font-size: 12px; font-weight: 500;
+  color: #1d1d1f; transition: all 0.2s;
+}
+#bottomBar button:hover { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
+#bottomBar button.warn { border-color: #ff9500; color: #ff9500; }
+#bottomBar button.warn:hover { background: #ff9500; color: #fff; }
+#bottomBar button.danger { border-color: #ff3b30; color: #ff3b30; }
+#bottomBar button.danger:hover { background: #ff3b30; color: #fff; }
+#dbgStatus { font-size: 11px; color: #86868b; margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<!-- 标签切换 -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-view="daily">今日</button>
+  <button class="tab-btn" data-view="weekly">本周</button>
+  <button class="tab-btn" data-view="monthly">本月</button>
+</div>
+
+<!-- 今日视图 -->
+<div class="view active" id="view-daily">
+  <div class="header">
+    <div class="header-left">
+      <div class="date" id="dateLabelDaily"></div>
+      <div class="title">今日任务</div>
+    </div>
+    <div class="header-right">
+      <div class="num" id="progressNumDaily">0/0</div>
+      <div class="label">已完成</div>
+    </div>
+  </div>
+  <div class="progress-area">
+    <div class="progress-meta">
+      <span class="progress-percent" id="progressPercentDaily">0%</span>
+      <span class="progress-fraction" id="progressFractionDaily">0 / 0</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar daily" id="progressBarDaily"></div>
+    </div>
+  </div>
+  <div class="task-list" id="taskListDaily"></div>
+  <div class="input-wrap">
+    <input type="text" id="newInputDaily" placeholder="添加今日任务，按回车确认...">
+    <button id="addBtnDaily">添加</button>
+  </div>
+</div>
+
+<!-- 本周视图 -->
+<div class="view" id="view-weekly">
+  <div class="header">
+    <div class="header-left">
+      <div class="date" id="dateLabelWeekly"></div>
+      <div class="title">本周计划</div>
+    </div>
+    <div class="header-right">
+      <div class="num" id="progressNumWeekly">0/0</div>
+      <div class="label">已完成</div>
+    </div>
+  </div>
+  <div class="progress-area">
+    <div class="progress-meta">
+      <span class="progress-percent" id="progressPercentWeekly">0%</span>
+      <span class="progress-fraction" id="progressFractionWeekly">0 / 0</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar weekly" id="progressBarWeekly"></div>
+    </div>
+  </div>
+  <div class="task-list" id="taskListWeekly"></div>
+  <div class="input-wrap">
+    <input type="text" id="newInputWeekly" placeholder="添加本周计划，按回车确认...">
+    <button id="addBtnWeekly">添加</button>
+  </div>
+</div>
+
+<!-- 本月视图 -->
+<div class="view" id="view-monthly">
+  <div class="header">
+    <div class="header-left">
+      <div class="date" id="dateLabelMonthly"></div>
+      <div class="title">本月目标</div>
+    </div>
+    <div class="header-right">
+      <div class="num" id="progressNumMonthly">0/0</div>
+      <div class="label">已完成</div>
+    </div>
+  </div>
+  <div class="progress-area">
+    <div class="progress-meta">
+      <span class="progress-percent" id="progressPercentMonthly">0%</span>
+      <span class="progress-fraction" id="progressFractionMonthly">0 / 0</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar monthly" id="progressBarMonthly"></div>
+    </div>
+  </div>
+  <div class="task-list" id="taskListMonthly"></div>
+  <div class="input-wrap">
+    <input type="text" id="newInputMonthly" placeholder="添加本月目标，按回车确认...">
+    <button id="addBtnMonthly">添加</button>
+  </div>
+</div>
+
+<!-- 历史回顾面板 -->
+<div id="historyOverlay">
+  <div id="historyPanel">
+    <div class="history-header">
+      <h3 id="historyTitle">历史记录</h3>
+      <button class="close-x" onclick="closeHistory()">✕</button>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+(function(){
+  // ========== 工具函数（全部改为本地时间，彻底修复 UTC 错位）==========
+  function pad(n){ return String(n).padStart(2,'0'); }
+  
+  function getTodayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+  
+function getWeekStr() {
+  const d = new Date();
+  const day = d.getDay(); // 0=周日, 1=周一, ..., 6=周六
+  
+  // 本周日（周日为一周第一天，今天如果是周日就是今天）
+  const sunday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - day);
+  
+  const year = sunday.getFullYear();
+  const month = sunday.getMonth() + 1;
+  const monthStr = pad(month);
+  
+  // 本月1号
+  const firstDay = new Date(year, month - 1, 1);
+  const firstDayWeekday = firstDay.getDay(); // 0=周日, 1=周一, ...
+  
+  // 本月第一个周日
+  let firstSunday = new Date(firstDay);
+  if (firstDayWeekday !== 0) {
+    firstSunday.setDate(firstSunday.getDate() + (7 - firstDayWeekday));
+  }
+  
+  // 计算是第几周
+  let weekNum = 1;
+  if (sunday >= firstSunday) {
+    const diffDays = Math.floor((sunday - firstSunday) / (24*60*60*1000));
+    weekNum = Math.floor(diffDays / 7) + 1;
+  }
+  
+  return `${year}-${monthStr}_W${weekNum}`;
+}
+  
+  function getMonthStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth()+1);
+  }
+
+  // ========== 周级任务继承辅助函数 ==========
+  function getMondayOfDate(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    const day = date.getDay(); // 0=周日, 1=周一, ..., 6=周六
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - ((day + 6) % 7));
+    return monday.getFullYear() + '-' + pad(monday.getMonth()+1) + '-' + pad(monday.getDate());
+  }
+
+  function isSameWeek(dateStr1, dateStr2) {
+    return getMondayOfDate(dateStr1) === getMondayOfDate(dateStr2);
+  }
+
+  function findRecentDailyInWeek(todayStr) {
+    const prefix = 'quest_daily_v4_';
+    const candidates = [];
+    let keys;
+    if (isPyWebView && pywebviewCache) {
+      keys = Object.keys(pywebviewCache);
+    } else {
+      keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        keys.push(localStorage.key(i));
+      }
+    }
+    keys.forEach(key => {
+      if (!key || !key.startsWith(prefix)) return;
+      const period = key.slice(prefix.length);
+      if (!period.match(/^\d{4}-\d{2}-\d{2}$/)) return;
+      if (period === todayStr) return;
+      if (isSameWeek(period, todayStr)) {
+        candidates.push(period);
+      }
+    });
+    if (candidates.length === 0) return null;
+    candidates.sort().reverse();
+    return candidates[0];
+  }
+
+  function formatDateLabelDaily() {
+    const d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth()+1);
+  }
+  
+  function formatDateLabelDaily() {
+    return new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
+  }
+  
+function formatDateLabelWeekly() {
+  const d = new Date();
+  const day = d.getDay(); // 0=周日, 1=周一, ..., 6=周六
+  const sunday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - day);
+  const saturday = new Date(sunday);
+  saturday.setDate(sunday.getDate() + 6);
+  const sunStr = (sunday.getMonth()+1) + '/' + sunday.getDate();
+  const satStr = (saturday.getMonth()+1) + '/' + saturday.getDate();
+  return sunStr + ' - ' + satStr;
+}
+  
+  function formatDateLabelMonthly() {
+    const d = new Date();
+    return d.getFullYear() + '年' + (d.getMonth()+1) + '月';
+  }
+
+  // ========== 动态 Key 生成 ==========
+  function getStorageKey(scope, period) {
+    return `quest_${scope}_v4_${period}`;
+  }
+  
+  function getAllPeriods(scope) {
+    const prefix = `quest_${scope}_v4_`;
+    const periods = [];
+    if(isPyWebView && pywebviewCache) {
+      Object.keys(pywebviewCache).forEach(key => {
+        if(key.startsWith(prefix)) {
+          const p = key.slice(prefix.length);
+          if(p) periods.push(p);
+        }
+      });
+    } else {
+      for(let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if(key && key.startsWith(prefix)) {
+          const p = key.slice(prefix.length);
+          if(p) periods.push(p);
+        }
+      }
+    }
+    return periods.sort().reverse();
+  }
+  
+  function readRaw(key) {
+    if(isPyWebView && pywebviewCache[key] !== undefined) return pywebviewCache[key];
+    return localStorage.getItem(key);
+  }
+  
+  function writeRaw(key, value) {
+    if(isPyWebView) pywebviewCache[key] = value;
+    else localStorage.setItem(key, value);
+  }
+
+  // ========== 音频 ==========
+  function playSound(type){
+    try{
+      const ctx = new (window.AudioContext||window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      if(type==='all'){
+        [392,523,659,784,1046].forEach((f,i)=>{
+          const o=ctx.createOscillator(), g=ctx.createGain();
+          o.type=i===4?'square':'sine'; o.frequency.value=f;
+          g.gain.setValueAtTime(i===4?0.06:0.1, now+i*0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, now+i*0.1+0.4);
+          o.connect(g); g.connect(ctx.destination);
+          o.start(now+i*0.1); o.stop(now+i*0.1+0.4);
+        });
+      }else{
+        [523,659,784,1046].forEach((f,i)=>{
+          const o=ctx.createOscillator(), g=ctx.createGain();
+          o.type='sine'; o.frequency.value=f;
+          g.gain.setValueAtTime(0.1, now+i*0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, now+i*0.08+0.35);
+          o.connect(g); g.connect(ctx.destination);
+          o.start(now+i*0.08); o.stop(now+i*0.08+0.35);
+        });
+      }
+    }catch(e){}
+  }
+
+  // ========== Toast ==========
+  function toast(title, desc, isAll){
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast' + (isAll?' gold':'');
+    const icon = isAll
+      ? '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
+      : '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7ee787" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>';
+    t.innerHTML = '<div class="toast-icon">'+icon+'</div><div><div class="toast-title">'+(isAll?'全部达成':'任务完成')+'</div><div class="toast-name">'+title+'</div><div class="toast-desc">'+desc+'</div></div>';
+    c.appendChild(t);
+    requestAnimationFrame(()=>t.classList.add('show'));
+    playSound(isAll?'all':'one');
+    setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),500); }, 3500);
+  }
+
+  // ========== 数据管理 ==========
+  const PERIODS = {
+    daily: getTodayStr,
+    weekly: getWeekStr,
+    monthly: getMonthStr
+  };
+
+  // 固定 ID：不同日期存在不同 key 下，互不干扰
+  const DEFAULTS = {
+    daily: [
+      {id:'d1', text:'🔥 Python：环境搭建 → 变量/数据类型/运算符（视频+课后练习）', done:false},
+      {id:'d2', text:'⭐ 英语：单词30个 + 听力/阅读15分钟', done:false},
+      {id:'d3', text:'💤 今日锻炼', done:false},
+      {id:'d4', text:'💤 音乐练习30分钟（钢琴/竖笛/唱歌）', done:false},
+      {id:'d5', text:'🌸 手工/粘土（心情驱动，完成今日任务后的奖励）', done:false}
+    ],
+    weekly: [
+      {id:'w1', text:'🔥 本地环境跑通 Hello World', done:false},
+      {id:'w2', text:'🔥 完成20道基础语法练习题', done:false},
+      {id:'w3', text:'⭐ 收集3份职业方向学习路线图（后端/数据分析/自动化）', done:false},
+      {id:'w4', text:'⭐ 背完英语 List 1-2', done:false},
+      {id:'w5', text:'⭐ 每天听力15分钟（7天打卡）', done:false},
+      {id:'w6', text:'⭐ 看完3个"一天工作"类视频', done:false},
+      {id:'w7', text:'💤 锻炼 3次', done:false},
+      {id:'w8', text:'💤 音乐 1次', done:false}
+    ],
+    monthly: [
+      {id:'m1', text:'🔥 9月筑基月：Python基础语法前半段掌握（变量→数据结构）', done:false},
+      {id:'m2', text:'🔥 三方向调研完成，产出对比表', done:false},
+      {id:'m3', text:'⭐ 英语List 1-8背完，维持每日语感', done:false},
+      {id:'m4', text:'💤 锻炼保持每周3-4次', done:false},
+      {id:'m5', text:'💤 音乐保持每周1-2次', done:false}
+    ]
+  };
+
+  const data = { daily: [], weekly: [], monthly: [] };
+  let isPyWebView = false;
+  let pywebviewCache = {};
+
+// ========== 数据加载 ==========
+function load(scope) {
+    const period = PERIODS[scope]();
+    const key = getStorageKey(scope, period);
+    try {
+        const raw = readRaw(key);
+        if (raw) {
+            const d = JSON.parse(raw);
+            data[scope] = (d.quests || []).map(q => ({
+                ...q,
+                done: q.hasOwnProperty('done') ? !!q.done : false
+            }));
+        } else {
+            // 新周期：尝试继承本周已有的每日任务列表（仅 daily 有效）
+            if (scope === 'daily') {
+                const recentDay = findRecentDailyInWeek(period);
+                if (recentDay) {
+                    const recentKey = getStorageKey('daily', recentDay);
+                    const recentRaw = readRaw(recentKey);
+                    if (recentRaw) {
+                        const recentData = JSON.parse(recentRaw);
+                        data[scope] = (recentData.quests || []).map(q => ({
+                            ...q,
+                            done: false  // 新的一天重置完成状态
+                        }));
+                        return;  // 继承成功，直接返回
+                    }
+                }
+            }
+            // 无历史记录或 weekly/monthly：加载默认模板
+            data[scope] = DEFAULTS[scope].map(q => ({ ...q }));
+        }
+    } catch (e) {
+        data[scope] = DEFAULTS[scope].map(q => ({ ...q }));
+    }
+}
+
+// ========== 数据保存 ==========
+function save(scope) {
+    const payload = {};
+    // 收集所有已存在的 key（包括其他 scope 的数据）
+    if (isPyWebView && pywebviewCache) {
+        Object.keys(pywebviewCache).forEach(key => {
+            if (key.match(/^quest_(daily|weekly|monthly)_v4_/)) {
+                payload[key] = pywebviewCache[key];
+            }
+        });
+    } else {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.match(/^quest_(daily|weekly|monthly)_v4_/)) {
+                payload[key] = localStorage.getItem(key);
+            }
+        }
+    }
+    // 更新当前 scope 的数据
+    const currentKey = getStorageKey(scope, PERIODS[scope]());
+    payload[currentKey] = JSON.stringify({ period: PERIODS[scope](), quests: data[scope] });
+
+    if (isPyWebView) {
+        pywebview.api.save_all_data(payload).then(() => {
+            pywebviewCache = { ...payload };
+        }).catch(e => console.error('保存失败', e));
+    } else {
+        Object.keys(payload).forEach(k => {
+            localStorage.setItem(k, payload[k]);
+        });
+    }
+}
+
+  // ========== 渲染 ==========
+  function update(scope){
+    const quests = data[scope];
+    const done = quests.filter(q=>q.done).length;
+    const total = quests.length;
+    const pct = total ? Math.round(done/total*100) : 0;
+
+    document.getElementById('progressNum'+cap(scope)).textContent = done+'/'+total;
+    document.getElementById('progressPercent'+cap(scope)).textContent = pct+'%';
+    document.getElementById('progressFraction'+cap(scope)).textContent = done + ' / ' + total;
+    document.getElementById('progressBar'+cap(scope)).style.width = pct+'%';
+
+    if(scope==='daily') document.getElementById('dateLabelDaily').textContent = formatDateLabelDaily();
+    if(scope==='weekly') document.getElementById('dateLabelWeekly').textContent = formatDateLabelWeekly();
+    if(scope==='monthly') document.getElementById('dateLabelMonthly').textContent = formatDateLabelMonthly();
+  }
+
+  function cap(s){ return s[0].toUpperCase()+s.slice(1); }
+
+  function render(scope){
+    const list = document.getElementById('taskList'+cap(scope));
+    list.innerHTML = '';
+    const quests = data[scope];
+
+    if(quests.length===0){
+      list.innerHTML = '<div class="empty-state">暂无任务，添加一个开始吧 ✨</div>';
+      update(scope);
+      return;
+    }
+
+    quests.forEach(q=>{
+      const row = document.createElement('div'); row.className='task-row';
+      const cb = document.createElement('div'); cb.className='checkbox'+(q.done?' done':'');
+      cb.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>';
+      cb.onclick = ()=>{
+        q.done=!q.done; save(scope); render(scope);
+        if(q.done) toast(q.text, quests.every(x=>x.done)?'所有任务已完成！':'任务已标记完成', quests.every(x=>x.done));
+      };
+      const txt = document.createElement('div'); txt.className='task-text'+(q.done?' done':''); txt.textContent=q.text;
+      const del = document.createElement('button'); del.className='delete-btn';
+      del.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+      del.onclick = ()=>{ data[scope]=data[scope].filter(x=>x.id!==q.id); save(scope); render(scope); };
+      row.appendChild(cb); row.appendChild(txt); row.appendChild(del);
+      list.appendChild(row);
+    });
+    update(scope);
+  }
+
+  function addTask(scope){
+    const inp = document.getElementById('newInput'+cap(scope));
+    const v = inp.value.trim(); if(!v) return;
+    data[scope].push({id:'u'+Date.now()+Math.random().toString(36).slice(2,6), text:v, done:false});
+    inp.value=''; save(scope); render(scope);
+  }
+
+  // ========== 标签切换 ==========
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    });
+  });
+
+  // ========== 历史回顾面板 ==========
+  function formatWeekLabel(period) {
+    const match = period.match(/^(\d{4})-(\d{2})_W(\d+)$/);
+    if (match) {
+      return `${match[1]}年${parseInt(match[2])}月 第${match[3]}周`;
+    }
+    // 兼容旧格式（如果存在）
+    if (period.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return '周起 ' + period;
+    }
+    return period;
+  }
+
+  window.openHistory = function() {
+    const activeView = document.querySelector('.tab-btn.active').dataset.view;
+    const scope = activeView;
+    const periods = getAllPeriods(scope);
+    const list = document.getElementById('historyList');
+    const title = document.getElementById('historyTitle');
+    const names = {daily: '每日', weekly: '每周', monthly: '每月'};
+    title.textContent = names[scope] + '历史记录 (' + periods.length + '条)';
+
+    if(periods.length === 0) {
+      list.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+    } else {
+      list.innerHTML = '';
+      periods.forEach((period, idx) => {
+        const key = getStorageKey(scope, period);
+        const raw = readRaw(key);
+        if(!raw) return;
+
+        let d = null;
+        try { d = JSON.parse(raw); } catch(e) { return; }
+        const quests = (d.quests || []).map(q => ({
+          ...q,
+          done: q.hasOwnProperty('done') ? !!q.done : false
+        }));
+        const done = quests.filter(q=>q.done).length;
+        const total = quests.length;
+        const pct = total ? Math.round(done/total*100) : 0;
+
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        const dateLabel = scope === 'daily' ? period 
+          : (scope === 'weekly' ? formatWeekLabel(period) 
+          : period.replace('-', '年') + '月');
+        item.innerHTML = `
+          <div class="history-item-header">
+            <span class="history-item-date">${dateLabel}</span>
+            <span class="history-item-rate ${pct===100&&total>0?'done':''}">${done}/${total} · ${pct}%</span>
+          </div>
+          <div class="history-bar-wrap"><div class="history-bar" style="width:${pct}%"></div></div>
+          <div class="history-detail" id="hist-detail-${idx}"></div>
+        `;
+        item.onclick = (e) => {
+          if(e.target.closest('.history-detail')) return;
+          const detail = document.getElementById('hist-detail-'+idx);
+          const isOpen = detail.classList.contains('open');
+          document.querySelectorAll('.history-detail').forEach(el=>el.classList.remove('open'));
+          if(!isOpen) {
+            detail.innerHTML = quests.map(q => 
+              `<div class="history-task ${q.done?'done':''}">${q.done?'✅':'⬜'} ${q.text}</div>`
+            ).join('') || '<div class="history-task">无任务</div>';
+            detail.classList.add('open');
+          }
+        };
+        list.appendChild(item);
+      });
+    }
+    document.getElementById('historyOverlay').classList.add('show');
+  };
+
+  window.closeHistory = function() {
+    document.getElementById('historyOverlay').classList.remove('show');
+  };
+  document.getElementById('historyOverlay').addEventListener('click', (e) => {
+    if(e.target === document.getElementById('historyOverlay')) closeHistory();
+  });
+
+  // ========== 启动 ==========
+  async function boot(){
+    let debugInfo = null;
+
+    if(typeof pywebview !== 'undefined' && pywebview.api){
+      isPyWebView = true;
+      try{
+        pywebviewCache = await pywebview.api.load_all_data() || {};
+        debugInfo = await pywebview.api.get_debug_info();
+        if(debugInfo){
+          // 调试模式下重写日期函数
+          const fd = debugInfo.frozen_daily;
+          const fw = debugInfo.frozen_weekly;
+          const fm = debugInfo.frozen_monthly;
+          getTodayStr = function(){ return fd; };
+          getWeekStr  = function(){ return fw; };
+          getMonthStr = function(){ return fm; };
+        }
+      }catch(e){ console.log('pywebview 初始化失败', e); }
+    }
+
+    // 初始化三个视图
+    ['daily','weekly','monthly'].forEach(scope=>{
+      document.getElementById('addBtn'+cap(scope)).onclick = ()=>addTask(scope);
+      document.getElementById('newInput'+cap(scope)).onkeydown = e=>{ if(e.key==='Enter') addTask(scope); };
+      load(scope);
+      render(scope);
+    });
+
+    // 底部工具栏
+    const bar = document.createElement('div');
+    bar.id = 'bottomBar';
+    bar.innerHTML = `
+      <button id="btnHist">📜 历史</button>
+      <button id="btnSave" style="${isPyWebView?'display:none;':''}">💾 保存</button>
+      <button id="btnLoad" style="${isPyWebView?'display:none;':''}">📂 读取</button>
+      <button id="btnSkip" class="warn" style="${debugInfo?'display:none;':''}">⏭ 跳过今天</button>
+      <button id="btnOff" class="danger" style="${debugInfo?'':'display:none;'}">❌ 关闭调试</button>
+      <span id="dbgStatus">${debugInfo ? '调试: ' + debugInfo.frozen_daily : ''}</span>
+    `;
+    document.body.appendChild(bar);
+    document.body.style.paddingBottom = '56px';
+
+    document.getElementById('btnHist').onclick = openHistory;
+
+    if(!isPyWebView){
+      document.getElementById('btnSave').onclick = async () => {
+        const payload = {};
+        for(let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if(key && key.match(/^quest_(daily|weekly|monthly)_v4_/)) payload[key] = localStorage.getItem(key);
+        }
+        const ok = await pywebview.api.save_all_data(payload);
+        toast(ok?'手动保存':'保存失败', ok?'数据已写入文件':'请检查权限', false);
+      };
+      document.getElementById('btnLoad').onclick = async () => {
+        const payload = await pywebview.api.load_all_data();
+        if(!payload || Object.keys(payload).length===0){ alert('没有找到存档'); return; }
+        Object.entries(payload).forEach(([k,v])=>{ if(v!==null) localStorage.setItem(k,v); });
+        toast('加载存档', '数据已恢复，即将刷新', false);
+        setTimeout(()=>location.reload(), 800);
+      };
+    }
+    document.getElementById('btnSkip').onclick = async () => {
+      const ok = await pywebview.api.enable_debug_skip();
+      if(ok){ toast('调试模式', '日期已冻结，即将刷新', false); setTimeout(()=>location.reload(), 800); }
+    };
+    document.getElementById('btnOff').onclick = async () => {
+      await pywebview.api.disable_debug_skip();
+      toast('调试模式', '已恢复正常日期，即将刷新', false);
+      setTimeout(()=>location.reload(), 800);
+    };
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
