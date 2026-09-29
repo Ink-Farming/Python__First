@@ -60,7 +60,7 @@ python__First
 │   └── S2E9.py
 ├── projects/              # 小型项目
 │   ├── Pyhsics_Experiment_Calculator.py
-│   ├── Pyhsics_Experiment_Calculator.py
+│   ├── Pyhsics_Experiment_Calculator_1.py        #物理实验数据处理程序
 │   ├── Word_Count.py               #字符串统计
 │   ├── list_driver.py              #文件目录扫描
 │   └── rename_demo.py              #文件名字批量更改
