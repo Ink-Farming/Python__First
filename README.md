@@ -59,9 +59,12 @@ python__First
 │   ├── S2E7_8.py
 │   └── S2E9.py
 ├── projects/              # 小型项目
-│   ├── CycleQuest
+│   ├── CycleQuest         # 每日/周/月的任务进度成就小程序
+│   │       ├── CycleQuestEditor.exe
 │   │       ├── README.md
 │   │       ├── app.html
+│   │       ├── data_editor.py
+│   │       ├── editor.html
 │   │       ├── main.exe
 │   │       ├── main.py
 │   │       ├── report_view.py
