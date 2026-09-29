@@ -95,9 +95,9 @@ python report_viewer.py
 
 提供一个可视化界面，用于查看和修改 `app_data.json` 中的历史任务数据。
 
-```bash
+```
 python data_editor.py
-
+```
 ## 💾 数据存储
 
 - 数据文件：`app_data.json`
