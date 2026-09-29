@@ -8,7 +8,12 @@ if not any(work.iterdir()):
     for i in range(1,6):
         (work / f"新建 文档 {i}.txt").write_text(f"第{i}个文件", encoding="UTF-8")
 # 找出要重命名的 txt 文件
-files = sorted(work.glob("*.txt"))        #这里是更改所有的txt文件
+#按照前缀查找
+#files = sorted(work.glob("note_.txt"))
+#按照后缀查找
+#files = sorted(work.glob("_2026.txt"))
+#关键词查找
+files = sorted(work.glob("*新建 文档*.txt"))
 prefix = "note"        #这是更改后的名字
 
 plan = []
