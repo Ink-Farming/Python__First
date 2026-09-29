@@ -59,6 +59,13 @@ python__First
 │   ├── S2E7_8.py
 │   └── S2E9.py
 ├── projects/              # 小型项目
+│   ├── CycleQuest
+│   │       ├── README.md
+│   │       ├── app.html
+│   │       ├── main.exe
+│   │       ├── main.py
+│   │       ├── report_view.py
+│   │       └── sort_app_data.py
 │   ├── Pyhsics_Experiment_Calculator.py
 │   ├── Pyhsics_Experiment_Calculator_1.py        #物理实验数据处理程序
 │   ├── Word_Count.py               #字符串统计
