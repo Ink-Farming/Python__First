@@ -98,6 +98,7 @@ python report_viewer.py
 ```
 python data_editor.py
 ```
+或是在有app_data.json文件的目录下运行CycleQuestEditor.exe文件
 ## 💾 数据存储
 
 - 数据文件：`app_data.json`
