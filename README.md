@@ -11,7 +11,7 @@
 - Python 3.x（建议 3.8 及以上）
 - 依赖库（如有）：
   ```
-  pip install -r requirements.txt
+ """其实没有"""
   ```
 ## 📂 项目结构
 ```
