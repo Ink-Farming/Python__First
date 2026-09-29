@@ -16,6 +16,14 @@
 ## 📂 项目结构
 ```
 python__First
+├── algorithm/             # 算法练习
+│   ├── S1E14.py
+│   ├── S1E15.py
+│   ├── S1E22.py
+│   ├── S1E23_24.py
+│   ├── S1E25.py
+│   ├── S1E6.py
+│   └── S1E5.py                    # 第一学期练习程序由S1开头
 ├── basics/                # 基础语法练习
 │   ├── FishC_Test
 │   │       ├── OpenMe.mp3
@@ -40,7 +48,6 @@ python__First
 │   ├── Test
 │   │     └── S1midterm.txt
 │   ├── BaiduStar_01_Discount.py        #百度之星测试题其3
-│   ├── S1E30_1.py
 │   ├── address_book.py                 #函数封装的基础练习
 │   ├── control_flow_exercises.py       #控制流语法练习
 │   ├── guess_number.py                 #基础语法练习1.猜数字程序
@@ -51,15 +58,9 @@ python__First
 │   ├── S2E10.py
 │   ├── S2E7_8.py
 │   └── S2E9.py
-├── algorithm/             # 算法练习
-│   ├── S1E14.py
-│   ├── S1E15.py
-│   ├── S1E22.py
-│   ├── S1E23_24.py
-│   ├── S1E25.py
-│   ├── S1E6.py
-│   └── S1E5.py                    # 第一学期练习程序由S1开头
 ├── projects/              # 小型项目
+│   ├── Pyhsics_Experiment_Calculator.py
+│   ├── Pyhsics_Experiment_Calculator.py
 │   ├── Word_Count.py               #字符串统计
 │   ├── list_driver.py              #文件目录扫描
 │   └── rename_demo.py              #文件名字批量更改
