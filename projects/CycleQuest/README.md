@@ -18,6 +18,7 @@
 - **额外工具**：
   - `sort_app_data.py`：按时间顺序整理 `app_data.json` 中的任务键
   - `report_viewer.py`：读取数据并生成可视化 HTML 报告（`report.html`）
+  - `CycleQuestEditor.exe`：调试修改`app_data.json`文件
 
 ---
 
@@ -28,7 +29,7 @@
 | `main.py` | 主程序，创建 pywebview 窗口，加载 `app.html`，提供保存/加载数据的 API |
 | `app.html` | 前端界面，包含全部交互逻辑与样式 |
 | `app_data.json` | 数据存储文件，运行后自动生成（与程序同目录） |
-| `data_editor.py` | 数据调试功能添加，请搭配editor.html在shell框内运行，否则容易闪退！ |
+| `data_editor.py` | 数据调试功能添加，请搭配`editor.html`在shell框内运行，否则容易闪退！ |
 | `editor.html` | 调试的前端界面，包含最基本的增删改（应该没有查吧？没怎么用） |
 | `sort_app_data.py` | 数据排序脚本，按时间顺序整理 `app_data.json` 中的 key |
 | `report_viewer.py` | 报告生成脚本，读取 `app_data.json` 并生成 `report.html` |
