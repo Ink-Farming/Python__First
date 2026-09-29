@@ -76,7 +76,7 @@ projects/	完整的小项目，如爬虫、数据分析等
 ## 🚀 如何使用
 克隆仓库到本地：
 ```
-git clone https://github.com/Farminglink/pthyon___First.git
+git clone https://github.com/Ink-Farming/Python__First.git
 ```
 进入对应目录，直接运行 Python 文件：
 ```
