@@ -60,6 +60,14 @@ python__First
 │   └── S2E9.py
 ├── projects/              # 小型项目
 │   ├── CycleQuest         # 每日/周/月的任务进度成就小程序
+│   │       ├── report_viewer
+│   │       │         ├── Readme.md
+│   │       │         ├── categories.py
+│   │       │         ├── config.py
+│   │       │         ├── data_loader.py
+│   │       │         ├── repot_viewer.py
+│   │       │         ├── stats.py
+│   │       │         └── styles.py
 │   │       ├── CycleQuestEditor.exe
 │   │       ├── README.md
 │   │       ├── app.html
@@ -67,7 +75,7 @@ python__First
 │   │       ├── editor.html
 │   │       ├── main.exe
 │   │       ├── main.py
-│   │       ├── report_view.py
+│   │       ├── report_view.py                   #旧整理文件
 │   │       └── sort_app_data.py
 │   ├── Pyhsics_Experiment_Calculator.py
 │   ├── Pyhsics_Experiment_Calculator_1.py        #物理实验数据处理程序
