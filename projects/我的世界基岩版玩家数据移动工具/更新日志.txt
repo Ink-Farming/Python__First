@@ -1,0 +1,40 @@
+更新日志 / 实际使用记录
+========================
+
+v1.0  2026-10-29
+----------------
+初版，三个脚本：
+  merge_players.py      服务器玩家数据搬迁（player_server_* + player_*）
+  move_local_player.py  本地玩家数据搬迁（~local_player）
+  ldb_tool.py           通用查看 / 复制键
+
+设计要点：
+  * 只动玩家相关键，其它数据不碰
+  * 覆盖前自动备份到 .player-backup / .local-backup
+  * 写完逐字节回读校验
+  * 不调用 compact，避免整库重写
+
+
+历史操作记录（这台机器）
+------------------------
+2026-10-28
+  旧存档 19 个服务器玩家（player_server_<uuid>）+ 35 条身份记录（player_<uuid>）
+  合并进新存档 db，54 条记录逐字节校验通过（ok=54 diff=0 missing=0）。
+
+2026-10-28
+  新存档客户端被商店自动升级到 1.26.60，改用 LeviLauncher 单独安装 1.26.51.1，
+  路径：%APPDATA%\levilauncher.exe\versions\1.26.51.1
+  安装时反复在 14% / 60% / 99.9% / 100% 失败（ERR_NATIVE_MSIXVC），
+  最终成功；装完 12,179 个文件 / 1,875 MB。
+
+2026-10-29
+  整理为独立工具文件夹，补 README 与使用说明，准备上传 GitHub。
+
+
+已知问题 / 备注
+---------------
+* 世界在 BDS 与单人之间互转时，玩家数据键会从 player_server_<uuid> 变成
+  ~local_player（或反过来），两者结构不同，无法直接互通 —— 这是 Mojang 的
+  已知问题（BDS-5121 / BDS-5688）。
+* .ldb 是 SSTable，带 CRC32C 校验，不能手工编辑；必须通过 leveldb 引擎读写。
+* Mojang 把 LevelDB 的压缩从 Snappy 换成了 zlib，普通 leveldb 库打不开基岩版 db。
