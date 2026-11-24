@@ -1,0 +1,256 @@
+[服务] http://127.0.0.1:47321/
+[mobile] 只读服务 0.0.0.0:47350
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 58636)
+Exception occurred during processing of request from ('172.56.159.35', 58620)
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 58308)
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 40678)
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 40688)
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+Traceback (most recent call last):
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+[mobile] 只读服务 0.0.0.0:47350
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 57388)
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 51506)
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 49234)
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 49244)
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socketserver.py", line 766, in __init__
+  File "socket.py", line 719, in readinto
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 40608)
+Exception occurred during processing of request from ('172.56.159.35', 40616)
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 49892)
+Exception occurred during processing of request from ('172.56.159.35', 49878)
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+Traceback (most recent call last):
+  File "socketserver.py", line 766, in __init__
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 55132)
+Exception occurred during processing of request from ('172.56.159.35', 55130)
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+  File "http\server.py", line 404, in handle_one_request
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+  File "socket.py", line 719, in readinto
+----------------------------------------
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 40310)
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 40320)
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "socketserver.py", line 697, in process_request_thread
+  File "http\server.py", line 436, in handle
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 51602)
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 51596)
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 32848)
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 32828)
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 51512)
+----------------------------------------
+Exception occurred during processing of request from ('172.56.159.35', 51502)
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 697, in process_request_thread
+  File "socketserver.py", line 362, in finish_request
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+  File "http\server.py", line 404, in handle_one_request
+  File "socketserver.py", line 362, in finish_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+  File "socketserver.py", line 766, in __init__
+  File "http\server.py", line 436, in handle
+----------------------------------------
+  File "http\server.py", line 404, in handle_one_request
+  File "socket.py", line 719, in readinto
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+----------------------------------------

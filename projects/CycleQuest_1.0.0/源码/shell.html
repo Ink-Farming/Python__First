@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CycleQuest 2.0</title>
+<style>
+  :root{
+    --bg:#f2f2f7; --card:#fff; --ink:#1d1d1f; --muted:#86868b;
+    --line:#e5e5ea; --soft:#fafafa;
+    --fire:#ff3b30; --star:#ff9500; --sleep:#007aff; --flower:#af52de; --green:#34c759;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.5; overflow:hidden;
+  }
+  .app{height:100vh;display:flex;flex-direction:column;background:var(--bg);}
+
+  header{padding:14px 18px 8px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex:0 0 auto;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .logo{width:32px;height:32px;border-radius:10px;background:#1d1d1f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;}
+  .brand h1{font-size:16px;letter-spacing:-.01em;line-height:1.2;}
+  .brand p{font-size:10.5px;color:var(--muted);margin-top:2px;}
+  .sync{font-size:10px;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 9px;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+  .sync i{width:6px;height:6px;border-radius:50%;background:var(--green);display:block;}
+
+  nav{display:flex;gap:2px;padding:0 12px;flex:0 0 auto;border-bottom:1px solid rgba(0,0,0,.04);background:rgba(242,242,247,.94);}
+  .tab{flex:1;border:0;background:transparent;padding:8px 0 7px;border-radius:10px;color:var(--muted);font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:.18s;}
+  .tab .ico{font-size:14px;line-height:1;}
+  .tab .txt{font-size:10px;font-weight:600;}
+  .tab.active{color:var(--ink);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.07);}
+
+  main{flex:1;overflow:auto;padding:12px 14px 18px;position:relative;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .card{background:var(--card);border-radius:15px;padding:13px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:9px;}
+  .card-title{font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+  .card-title small{font-size:10px;font-weight:500;color:var(--muted);}
+
+  .hero{display:flex;align-items:center;gap:13px;padding:15px;}
+  .ring{position:relative;flex:0 0 78px;width:78px;height:78px;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:17px;font-weight:800;}
+  .ring .num span{font-size:9px;font-weight:500;color:var(--muted);}
+  .hero-main{flex:1;min-width:0;}
+  .hero-main .date{font-size:10.5px;color:var(--muted);}
+  .hero-main h2{font-size:15px;margin:2px 0 3px;letter-spacing:-.01em;}
+  .hero-main p{font-size:11px;color:#3a3a3c;}
+  .hero-main .go{margin-top:7px;border:0;background:#1d1d1f;color:#fff;border-radius:8px;font-family:inherit;font-size:10.5px;font-weight:600;padding:5px 10px;cursor:pointer;}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px;}
+  .stat{background:#fff;border-radius:13px;padding:10px 9px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .stat b{font-size:17px;letter-spacing:-.02em;display:block;}
+  .stat span{font-size:9.5px;color:var(--muted);}
+
+  .mk-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .mk-title{font-size:12px;font-weight:700;}
+  .mk-sub{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.5;}
+  .mk-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:0 0 auto;}
+  .mk-dots{display:flex;gap:4px;}
+  .mk-dot{width:8px;height:8px;border-radius:50%;background:#e5e5ea;}
+  .mk-dot.on{background:var(--green);}
+  .mk-left{font-size:9.5px;color:var(--muted);white-space:nowrap;}
+
+  .node{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #f2f2f7;}
+  .node:last-child{border-bottom:0;padding-bottom:0;}
+  .node .dot{width:8px;height:8px;border-radius:50%;background:var(--c,#86868b);flex:0 0 8px;}
+  .node .n-name{flex:1;font-size:12px;font-weight:600;}
+  .node .n-date{font-size:10px;color:var(--muted);}
+  .node .n-days{font-size:10.5px;font-weight:700;color:var(--c,#86868b);min-width:40px;text-align:right;}
+
+  .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+  .quick button{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 5px;font-family:inherit;font-size:10.5px;font-weight:600;color:#3a3a3c;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .quick button span{font-size:15px;}
+
+  .frame{width:100%;height:calc(100vh - 150px);border:0;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+
+  .search{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 10px;margin-bottom:9px;}
+  .search input{flex:1;border:0;outline:none;font-family:inherit;font-size:11.5px;background:transparent;}
+
+  .row{display:flex;align-items:center;gap:7px;padding:8px 2px;border-bottom:1px solid #f2f2f7;}
+  .row:last-child{border-bottom:0;}
+  .row .r-period{flex:0 0 74px;font-size:11px;font-weight:600;}
+  .row .r-bar{flex:1;height:5px;background:#ececf1;border-radius:3px;overflow:hidden;}
+  .row .r-bar i{display:block;height:100%;background:var(--green);border-radius:3px;}
+  .row .r-num{flex:0 0 54px;text-align:right;font-size:10px;color:var(--muted);}
+  .r-btn{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:7px;font-family:inherit;font-size:9.5px;padding:3px 6px;color:#3a3a3c;cursor:pointer;}
+  .r-btn.mk{border-color:#e8d5ff;background:#faf5ff;color:#8e44d8;}
+  .r-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+  .tool{display:flex;gap:10px;align-items:flex-start;}
+  .tool .t-ico{flex:0 0 32px;width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;background:#f2f2f7;}
+  .tool .t-main{flex:1;min-width:0;}
+  .tool h3{font-size:12px;font-weight:700;}
+  .tool p{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.5;}
+  .tool .t-status{font-size:9.5px;color:var(--muted);margin-top:5px;white-space:pre-line;line-height:1.5;}
+  .t-actions{display:flex;gap:6px;margin-top:7px;}
+  .t-btn{border:0;background:#1d1d1f;color:#fff;border-radius:8px;font-family:inherit;font-size:10px;font-weight:600;padding:5px 9px;cursor:pointer;}
+  .t-btn.ghost{background:#fff;color:#1d1d1f;border:1px solid var(--line);}
+
+  .report-hero{background:linear-gradient(135deg,#1d1d1f 0%,#3a3a3c 100%);color:#fff;border-radius:15px;padding:15px;margin-bottom:9px;}
+  .report-hero h2{font-size:14px;}
+  .report-hero p{font-size:10px;color:#c7c7cc;margin-top:4px;line-height:1.6;}
+  .report-hero .btns{display:flex;gap:7px;margin-top:11px;}
+  .report-hero button{border:0;border-radius:8px;padding:6px 11px;font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;background:#fff;color:#1d1d1f;}
+
+  .bars{display:flex;align-items:flex-end;gap:8px;height:100px;padding:8px 2px 0;}
+  .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+  .bar{width:100%;max-width:30px;border-radius:5px 5px 2px 2px;background:#ff9500;position:relative;}
+  .bar b{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:8.5px;color:var(--muted);font-weight:600;}
+  .bar-wrap span{font-size:9px;color:var(--muted);}
+
+  footer{padding:7px 18px 10px;display:flex;justify-content:space-between;font-size:9px;color:#aeaeb2;flex:0 0 auto;}
+
+  /* sheet */
+  .sheet-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60;opacity:0;pointer-events:none;transition:.2s;}
+  .sheet-mask.show{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:560px;transform:translate(-50%,105%);z-index:61;background:#fff;border-radius:20px 20px 0 0;padding:10px 16px 18px;transition:transform .26s cubic-bezier(.2,.8,.2,1);max-height:78vh;overflow:auto;}
+  .sheet.show{transform:translate(-50%,0);}
+  .sheet-handle{width:34px;height:4px;border-radius:2px;background:#e5e5ea;margin:0 auto 12px;}
+  .sheet h3{font-size:13.5px;}
+  .sheet .sub{font-size:10px;color:var(--muted);margin:3px 0 11px;line-height:1.5;}
+  .mk-item{display:flex;align-items:flex-start;gap:9px;padding:9px;border-radius:10px;background:var(--soft);margin-bottom:6px;}
+  .mk-item .t-text{font-size:11.5px;line-height:1.5;}
+  .mk-item .t-meta{font-size:9.5px;color:var(--muted);margin-top:2px;}
+  .check{flex:0 0 21px;width:21px;height:21px;border-radius:6px;border:1.5px solid #d1d1d6;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:transparent;font-size:11px;font-weight:800;}
+  .check.done{background:var(--green);border-color:var(--green);color:#fff;}
+  .check:disabled{cursor:default;}
+  .sheet-foot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;}
+  .sheet-foot .cnt{font-size:10.5px;color:var(--muted);}
+  .sheet-foot button{border:0;background:#1d1d1f;color:#fff;border-radius:9px;padding:8px 15px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;}
+  .sheet-foot button:disabled{background:#c7c7cc;cursor:not-allowed;}
+
+  #toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,12px);background:#1d1d1f;color:#fff;font-size:11px;padding:7px 13px;border-radius:9px;opacity:0;pointer-events:none;transition:.22s;z-index:99;}
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">✓</div>
+      <div>
+        <h1>CycleQuest 2.0</h1>
+        <p>任务 · 补卡 · 数据 · 工具 · 报告</p>
+      </div>
+    </div>
+    <div class="sync"><i></i><span id="syncText">已连接</span></div>
+  </header>
+
+  <nav>
+    <button class="tab active" data-tab="home"><span class="ico">🏠</span><span class="txt">总览</span></button>
+    <button class="tab" data-tab="tasks"><span class="ico">📋</span><span class="txt">任务</span></button>
+    <button class="tab" data-tab="data"><span class="ico">🗂</span><span class="txt">数据</span></button>
+    <button class="tab" data-tab="tools"><span class="ico">🧰</span><span class="txt">工具</span></button>
+    <button class="tab" data-tab="report"><span class="ico">📊</span><span class="txt">报告</span></button>
+  </nav>
+
+  <main id="main">
+    <section class="panel active" id="panel-home">
+      <div class="card hero">
+        <div class="ring">
+          <svg width="78" height="78" viewBox="0 0 78 78">
+            <circle cx="39" cy="39" r="32" fill="none" stroke="#ececf1" stroke-width="7"/>
+            <circle id="ringArc" cx="39" cy="39" r="32" fill="none" stroke="#007aff" stroke-width="7" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="100"/>
+          </svg>
+          <div class="num"><span id="ringNum">0/0</span><span>今天</span></div>
+        </div>
+        <div class="hero-main">
+          <div class="date" id="heroDate">—</div>
+          <h2 id="heroTitle">正在读取…</h2>
+          <p id="heroDesc">今天的任务会显示在这里。</p>
+          <button class="go" data-goto="tasks">去任务页 →</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b id="statStreak">—</b><span>连续打卡</span></div>
+        <div class="stat"><b id="statWeek">—</b><span>本周完成</span></div>
+        <div class="stat"><b id="statTotal">—</b><span>总完成率</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">今日补卡 <small id="mkLimitText">—</small></div>
+        <div class="mk-row">
+          <div>
+            <div class="mk-title" id="mkTitle">补最近没完成的任务</div>
+            <div class="mk-sub" id="mkSub">每天 2 个名额，周末 3 个；先补最近的，补完才能往前。</div>
+          </div>
+          <div class="mk-right">
+            <span class="mk-dots" id="mkDots"></span>
+            <span class="mk-left" id="mkLeft">—</span>
+          </div>
+        </div>
+        <div class="t-actions" style="margin-top:8px;">
+          <button class="t-btn" id="goMakeup">去补卡</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">近期节点 <small>来自考试计划</small></div>
+        <div id="nodes"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">常用 <small>点了才运行</small></div>
+        <div class="quick">
+          <button data-goto="tools"><span>🧩</span>补全周期</button>
+          <button data-goto="data"><span>🩹</span>补卡</button>
+          <button data-goto="report"><span>📈</span>生成报告</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-tasks">
+      <iframe class="frame" id="questFrame" src="about:blank" title="任务"></iframe>
+    </section>
+
+    <section class="panel" id="panel-data">
+      <div class="search">
+        <span>🔍</span>
+        <input id="dataSearch" placeholder="搜索日期，例如 11.23 / 2026-11">
+      </div>
+      <div class="card" id="dataList">
+        <div class="card-title">最近记录 <small id="dataCount">—</small></div>
+      </div>
+      <div class="card">
+        <div class="card-title">存储 <small>自动备份已开启</small></div>
+        <div class="node"><span class="dot" style="--c:#34c759"></span><span class="n-name">app_data.json</span><span class="n-days" id="fileSize">—</span></div>
+        <div class="node"><span class="dot" style="--c:#007aff"></span><span class="n-name">备份</span><span class="n-days" id="backupCount">—</span></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-tools">
+      <div class="card">
+        <div class="tool">
+          <div class="t-ico">🧩</div>
+          <div class="t-main">
+            <h3>补全缺失周期</h3>
+            <p>按最近一条模板补齐缺失的日/周/月。先预览，确认后才写；补出来的空白日会成为补卡对象。</p>
+            <div class="t-status" id="backfillStatus">还没检查</div>
+            <div class="t-actions">
+              <button class="t-btn ghost" id="backfillPreview">预览</button>
+              <button class="t-btn" id="backfillApply" style="display:none;">应用补全</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tool">
+          <div class="t-ico">🔀</div>
+          <div class="t-main">
+            <h3>排序与一致性校验</h3>
+            <p>按时间重排所有周期，检查 key 和 value.period 是否对不上。</p>
+            <div class="t-status" id="sortStatus">还没检查</div>
+            <div class="t-actions">
+              <button class="t-btn ghost" id="sortPreview">检查</button>
+              <button class="t-btn" id="sortApply" style="display:none;">应用排序</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tool">
+          <div class="t-ico">💾</div>
+          <div class="t-main">
+            <h3>备份管理</h3>
+            <p>立即备份当前数据；每次保存也会自动备份，保留最近 40 份。</p>
+            <div class="t-status" id="backupStatus">—</div>
+            <div class="t-actions"><button class="t-btn ghost" id="backupNow">立即备份</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tool">
+          <div class="t-ico">📱</div>
+          <div class="t-main">
+            <h3>手机查看（只读）</h3>
+            <p>手机连同一 Wi-Fi，打开地址并输入访问码。手机只能看，不能改；写入接口不对手机开放。</p>
+            <div class="t-status" id="pairInfo">正在读取…</div>
+            <div class="t-actions">
+              <button class="t-btn" id="pairStart">开启手机访问</button>
+              <button class="t-btn ghost" id="pairStop">关闭</button>
+              <button class="t-btn ghost" id="pairCopy">复制地址</button>
+              <button class="t-btn ghost" id="pairReload">刷新</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tool">
+          <div class="t-ico">📄</div>
+          <div class="t-main">
+            <h3>手机文件（离线）</h3>
+            <p>导出今天的任务给手机 App；手机完成后把 done.json 导回来。只改今天的完成状态，其他以电脑为准。</p>
+            <div class="t-status" id="phoneFileStatus">—</div>
+            <div class="t-actions">
+              <button class="t-btn" id="exportToday">导出今日任务</button>
+              <label class="t-btn ghost" for="importDone"
+                     style="display:inline-flex;align-items:center;cursor:pointer;margin:0;">导入手机完成</label>
+              <input type="file" id="importDone" accept=".json,application/json" style="display:none">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-report">
+      <div class="report-hero">
+        <h2>年度计划执行报告</h2>
+        <p id="reportSub">点“生成”才会重新统计，不点不跑。</p>
+        <div class="btns">
+          <button id="reportGen">生成报告</button>
+          <button id="reportOpen" style="background:rgba(255,255,255,.14);color:#fff;">新窗口打开</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">月度完成率 <small id="reportTime">—</small></div>
+        <div class="bars" id="monthBars"></div>
+      </div>
+      <div class="card" id="reportBox" style="display:none;padding:0;overflow:hidden;">
+        <iframe id="reportFrame" style="width:100%;height:520px;border:0;"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>单进程 · 五个分区 · 按需加载</span>
+    <span>2.0</span>
+  </footer>
+</div>
+
+<div class="sheet-mask" id="sheetMask"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <h3 id="sheetTitle">补卡</h3>
+  <div class="sub" id="sheetSub"></div>
+  <div id="sheetList"></div>
+  <div class="sheet-foot">
+    <span class="cnt" id="sheetCnt"></span>
+    <button id="sheetOk">确认补卡</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  const S = { data: {}, meta: null, sheetMode: 'makeup', selected: new Set(), sheetDate: null };
+
+  const $ = sel => document.querySelector(sel);
+  const esc = s => String(s == null ? '' : s);
+
+  function toast(msg) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+
+  async function api(url, body) {
+    const opt = body === undefined ? {} : {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    };
+    const res = await fetch(url, opt);
+    return res.json();
+  }
+
+  function parseDB() {
+    const db = {};
+    Object.keys(S.data || {}).forEach(k => {
+      try { db[k] = JSON.parse(S.data[k]); } catch (e) { db[k] = { quests: [] }; }
+    });
+    return db;
+  }
+
+  function keyOf(scope, period) {
+    return 'quest_' + scope + '_v4_' + period;
+  }
+
+  function todayISO() {
+    const d = new Date();
+    const p = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+
+  function parseDate(s) {
+    const p = String(s).split('-').map(Number);
+    return new Date(p[0], p[1] - 1, p[2]);
+  }
+
+  function weekdayName(s) {
+    return ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][parseDate(s).getDay()];
+  }
+
+  function md(s) {
+    const d = parseDate(s);
+    return (d.getMonth() + 1) + '.' + d.getDate();
+  }
+
+  function daysUntil(s) {
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    const d = parseDate(s);
+    return Math.round((d - t) / 86400000);
+  }
+
+  function counts(obj) {
+    const qs = (obj && obj.quests) || [];
+    return { done: qs.filter(q => q.done).length, total: qs.length };
+  }
+
+  /* ---------------- 渲染 ---------------- */
+  function renderHome() {
+    const meta = S.meta;
+    if (!meta) return;
+    const db = parseDB();
+    const today = meta.today;
+    const obj = db[keyOf('daily', today)] || { quests: [] };
+    const c = counts(obj);
+    const pct = c.total ? c.done / c.total : 0;
+
+    $('#ringNum').textContent = c.done + '/' + c.total;
+    $('#ringArc').setAttribute('stroke-dashoffset', String(201 * (1 - pct)));
+    $('#ringArc').setAttribute('stroke', pct === 1 ? '#34c759' : '#007aff');
+
+    $('#heroDate').textContent = today.replace(/-/g, '.') + ' · ' + weekdayName(today);
+    $('#heroTitle').textContent = c.total === 0 ? '今天还没有任务' :
+      (c.done === c.total ? '今天全部完成' : '今天还剩 ' + (c.total - c.done) + ' 件');
+    $('#heroDesc').textContent = c.total === 0 ? '去任务页加一条，或者从补卡开始。' : '完成一项就勾一项，别攒着。';
+
+    $('#statTotal').textContent = meta.totals.pct + '%';
+    $('#statWeek').textContent = weekRate(db) + '%';
+    $('#statStreak').textContent = streakDays(db) + ' 天';
+
+    const q = meta.quota;
+    const dots = [];
+    for (let i = 0; i < q.limit; i++) dots.push('<i class="mk-dot ' + (i < q.remaining ? 'on' : '') + '"></i>');
+    $('#mkDots').innerHTML = dots.join('');
+    $('#mkLeft').textContent = q.remaining > 0 ? '今天剩 ' + q.remaining + ' 个' : '今天已用完';
+    $('#mkLimitText').textContent = '每天 ' + q.limit + ' 个';
+
+    if (meta.eligible) {
+      const e = meta.eligible;
+      $('#mkTitle').textContent = '最近待补：' + md(e.date) + ' ' + weekdayName(e.date);
+      $('#mkSub').textContent = '这天还有 ' + e.quests.length + ' 项没完成；补完它才能继续往前。';
+      $('#goMakeup').disabled = false;
+    } else {
+      $('#mkTitle').textContent = '没有待补的任务';
+      $('#mkSub').textContent = '过去所有每日任务都已完成。';
+      $('#goMakeup').disabled = true;
+    }
+
+    $('#nodes').innerHTML = [
+      ['2026-12-12', '英语四级', '#ff3b30'],
+      ['2026-12-17', '数据结构机考', '#ff9500'],
+      ['2026-12-30', 'JavaScript 考试', '#af52de'],
+      ['2027-01-11', '期末周', '#007aff']
+    ].map(([d, n, c]) => {
+      const left = daysUntil(d);
+      return '<div class="node" style="--c:' + c + '"><span class="dot"></span><span class="n-name">' + n +
+        '</span><span class="n-date">' + md(d) + ' ' + weekdayName(d) + '</span><span class="n-days">' +
+        (left > 0 ? left + ' 天' : '已过') + '</span></div>';
+    }).join('');
+
+    renderData();
+  }
+
+  function weekRate(db) {
+    let done = 0, total = 0;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const monday = new Date(today); monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday); d.setDate(monday.getDate() + i);
+      const p = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      const obj = db[keyOf('daily', p)];
+      if (obj) { const c = counts(obj); done += c.done; total += c.total; }
+    }
+    return total ? Math.round(done / total * 100) : 0;
+  }
+
+  function streakDays(db) {
+    let n = 0;
+    const d = new Date(); d.setHours(0, 0, 0, 0);
+    for (;;) {
+      const p = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      const obj = db[keyOf('daily', p)];
+      if (!obj) break;
+      const c = counts(obj);
+      if (!c.total || c.done < c.total) break;
+      n++;
+      d.setDate(d.getDate() - 1);
+    }
+    return n;
+  }
+
+  function renderData() {
+    const meta = S.meta;
+    if (!meta) return;
+    $('#dataCount').textContent = '共 ' + meta.records + ' 条';
+    $('#backupCount').textContent = meta.backups + ' 份';
+    $('#fileSize').textContent = '—';
+
+    const rows = meta.daily.map(r => {
+      const isEligible = meta.eligible && meta.eligible.date === r.date;
+      const canMakeup = isEligible && meta.quota.remaining > 0;
+      return '<div class="row" data-key="' + r.date + '">' +
+        '<span class="r-period">' + md(r.date) + ' ' + weekdayName(r.date) + '</span>' +
+        '<span class="r-bar"><i style="width:' + r.pct + '%"></i></span>' +
+        '<span class="r-num">' + r.done + '/' + r.total + ' · ' + r.pct + '%</span>' +
+        '<button class="r-btn mk" data-mk="' + r.date + '"' + (canMakeup ? '' : ' disabled') + '>补卡</button>' +
+        '<button class="r-btn" data-view="' + r.date + '">查看</button>' +
+        '</div>';
+    }).join('');
+    $('#dataList').innerHTML = '<div class="card-title">最近记录 <small>共 ' + meta.records + ' 条</small></div>' + rows;
+
+    $('#dataList').querySelectorAll('[data-mk]').forEach(b => {
+      b.addEventListener('click', () => openMakeup());
+    });
+    $('#dataList').querySelectorAll('[data-view]').forEach(b => {
+      b.addEventListener('click', () => openView(b.dataset.view));
+    });
+  }
+
+  function renderReport() {
+    const meta = S.meta;
+    if (!meta) return;
+    $('#reportSub').textContent = '从 2026.08.22 到现在，' + meta.totals.total + ' 项 · 完成 ' + meta.totals.done + ' 项。';
+    $('#reportTime').textContent = meta.report_time ? '上次生成 ' + meta.report_time : '还没生成过';
+
+    const months = Object.keys(meta.monthly);
+    const max = Math.max.apply(null, months.map(m => meta.monthly[m].total ? meta.monthly[m].done / meta.monthly[m].total * 100 : 0).concat([100]));
+    $('#monthBars').innerHTML = months.map(m => {
+      const t = meta.monthly[m];
+      const rate = t.total ? Math.round(t.done / t.total * 100) : 0;
+      return '<div class="bar-wrap"><div class="bar" style="height:' + (rate / max * 100) + '%"><b>' + rate + '%</b></div><span>' + m.slice(5) + '月</span></div>';
+    }).join('');
+  }
+
+  async function refresh() {
+    try {
+      const res = await api('/api/state');
+      S.data = res.data || {};
+      S.meta = res.meta || null;
+      renderHome();
+      renderReport();
+      if (S.meta) {
+        const q = S.meta.quota;
+        $('#syncText').textContent = q.remaining > 0 ? '已连接 · 可补 ' + q.remaining + ' 个' : '已连接 · 自动保存';
+      }
+    } catch (e) {
+      $('#syncText').textContent = '连接失败';
+    }
+  }
+
+  /* ---------------- 补卡 / 查看 ---------------- */
+  function openSheet() {
+    $('#sheetMask').classList.add('show');
+    $('#sheet').classList.add('show');
+    $('#sheet').scrollTop = 0;
+  }
+
+  function closeSheet() {
+    $('#sheetMask').classList.remove('show');
+    $('#sheet').classList.remove('show');
+    S.selected.clear();
+  }
+
+  function openMakeup() {
+    const meta = S.meta;
+    if (!meta || !meta.eligible) { toast('没有待补的任务'); return; }
+    if (meta.quota.remaining <= 0) { toast('今天的补卡名额用完了，明天再来'); return; }
+
+    S.sheetMode = 'makeup';
+    S.sheetDate = meta.eligible.date;
+    S.selected.clear();
+
+    $('#sheetTitle').textContent = md(meta.eligible.date) + ' ' + weekdayName(meta.eligible.date) + ' · 补卡';
+    $('#sheetSub').textContent = '只列没完成的任务；今天还能补 ' + meta.quota.remaining + ' 个。补完最近的，才能继续往前。';
+    $('#sheetOk').textContent = '确认补卡';
+    $('#sheetOk').style.display = '';
+    $('#sheetOk').disabled = true;
+
+    $('#sheetList').innerHTML = meta.eligible.quests.map(q => (
+      '<div class="mk-item" data-id="' + esc(q.id) + '">' +
+        '<button class="check" aria-label="选择">✓</button>' +
+        '<div class="t-body"><div class="t-text">' + esc(q.text) + '</div>' +
+        (q.meta ? '<div class="t-meta">' + esc(q.meta) + '</div>' : '') +
+        '</div></div>'
+    )).join('');
+
+    $('#sheetList').querySelectorAll('.mk-item').forEach(item => {
+      const btn = item.querySelector('.check');
+      btn.addEventListener('click', () => {
+        const id = item.dataset.id;
+        if (S.selected.has(id)) {
+          S.selected.delete(id);
+          btn.classList.remove('done');
+        } else {
+          if (S.selected.size >= meta.quota.remaining) { toast('今天只剩 ' + meta.quota.remaining + ' 个名额'); return; }
+          S.selected.add(id);
+          btn.classList.add('done');
+        }
+        updateSheet();
+      });
+    });
+
+    updateSheet();
+    openSheet();
+  }
+
+  function openView(date) {
+    const db = parseDB();
+    const obj = db[keyOf('daily', date)];
+    if (!obj) return;
+    S.sheetMode = 'view';
+    S.sheetDate = date;
+
+    $('#sheetTitle').textContent = md(date) + ' ' + weekdayName(date) + ' · 明细';
+    $('#sheetSub').textContent = '已完成 ' + counts(obj).done + '/' + counts(obj).total + ' 项。';
+    $('#sheetOk').style.display = 'none';
+    $('#sheetList').innerHTML = (obj.quests || []).map(q => (
+      '<div class="mk-item">' +
+        '<button class="check ' + (q.done ? 'done' : '') + '" disabled>✓</button>' +
+        '<div class="t-body"><div class="t-text"' + (q.done ? ' style="color:#a1a1a6;text-decoration:line-through;"' : '') + '>' + esc(q.text) + '</div></div>' +
+      '</div>'
+    )).join('');
+    openSheet();
+  }
+
+  function updateSheet() {
+    if (S.sheetMode === 'makeup') {
+      const remain = S.meta.quota.remaining;
+      $('#sheetCnt').textContent = '已选 ' + S.selected.size + '/' + remain;
+      $('#sheetOk').disabled = S.selected.size === 0;
+    } else {
+      const c = counts(parseDB()[keyOf('daily', S.sheetDate)] || {});
+      $('#sheetCnt').textContent = c.done + '/' + c.total + ' 已完成';
+    }
+  }
+
+  $('#sheetOk').addEventListener('click', async () => {
+    const ids = Array.from(S.selected);
+    if (!ids.length) return;
+    const res = await api('/api/makeup', { date: S.sheetDate, ids: ids });
+    if (!res.ok) { toast(res.error || '补卡失败'); return; }
+    S.data = res.data || S.data;
+    S.meta = res.meta || S.meta;
+    closeSheet();
+    renderHome();
+    renderReport();
+    toast('补卡成功：' + ids.length + ' 项');
+    const frame = $('#questFrame');
+    if (frame && frame.src && frame.src !== 'about:blank') frame.contentWindow.location.reload();
+  });
+
+  $('#sheetMask').addEventListener('click', closeSheet);
+
+  /* ---------------- 工具 ---------------- */
+  async function backfill(mode) {
+    const res = await api('/api/tools/backfill', { mode: mode });
+    if (mode === 'preview') {
+      const t = res.total || 0;
+      const parts = ['daily', 'weekly', 'monthly'].map(k => (res.added[k] || []).length)
+        .map((n, i) => ['日', '周', '月'][i] + ' ' + n).join(' · ');
+      $('#backfillStatus').textContent = t ? '将补 ' + t + ' 条：' + parts : '没有缺失，数据是完整的';
+      $('#backfillApply').style.display = t ? '' : 'none';
+    } else {
+      const t = ['daily', 'weekly', 'monthly'].reduce((a, k) => a + (res.added[k] || []).length, 0);
+      $('#backfillStatus').textContent = '已补 ' + t + ' 条';
+      $('#backfillApply').style.display = 'none';
+      if (res.data) S.data = res.data;
+      if (res.meta) S.meta = res.meta;
+      renderHome(); renderReport();
+      toast('补全完成');
+    }
+  }
+
+  async function sortTool(mode) {
+    const res = await api('/api/tools/sort', { mode: mode });
+    if (mode === 'preview') {
+      $('#sortStatus').textContent = '顺序' + (res.sorted ? '已经正确' : '需要调整 ' + res.changed + ' 处') +
+        (res.warnings.length ? '\n' + res.warnings.slice(0, 3).join('\n') : '\n未发现 key/period 不一致');
+      $('#sortApply').style.display = res.sorted ? 'none' : '';
+    } else {
+      $('#sortStatus').textContent = '已重新排序';
+      $('#sortApply').style.display = 'none';
+      if (res.data) S.data = res.data;
+      toast('排序完成');
+    }
+  }
+
+  /* ---------------- 报告 ---------------- */
+  async function generateReport() {
+    $('#reportGen').disabled = true;
+    $('#reportGen').textContent = '生成中…';
+    const res = await api('/api/report', {});
+    $('#reportGen').disabled = false;
+    $('#reportGen').textContent = '生成报告';
+    if (!res.ok) { toast('生成失败'); return; }
+    $('#reportBox').style.display = '';
+    $('#reportFrame').src = res.url;
+    toast('报告已生成');
+  }
+
+  /* ---------------- 导航 ---------------- */
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const panels = Array.from(document.querySelectorAll('.panel'));
+
+  function show(name) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+    if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name);
+
+    if (name === 'tasks') {
+      const f = $('#questFrame');
+      if (f && (!f.src || f.src === 'about:blank')) f.src = '/app/';
+    }
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+  document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => show(b.dataset.goto)));
+
+  $('#goMakeup').addEventListener('click', () => { show('data'); setTimeout(openMakeup, 120); });
+  $('#backfillPreview').addEventListener('click', () => backfill('preview'));
+  $('#backfillApply').addEventListener('click', () => backfill('apply'));
+  $('#sortPreview').addEventListener('click', () => sortTool('preview'));
+  $('#sortApply').addEventListener('click', () => sortTool('apply'));
+  $('#reportGen').addEventListener('click', generateReport);
+  $('#reportOpen').addEventListener('click', () => window.open('/report/view', '_blank'));
+
+  $('#backupNow').addEventListener('click', async () => {
+    const res = await api('/api/backup', {});
+    $('#backupStatus').textContent = res.ok ? '已备份，共 ' + res.backups + ' 份' : '备份失败';
+    await refresh();
+  });
+
+  let pairData = null;
+  async function loadPair() {
+    try {
+      const res = await api('/api/pair-info');
+      if (!res.ok) { $('#pairInfo').textContent = '读取失败。'; return; }
+      if (!res.running) {
+        pairData = null;
+        $('#pairInfo').textContent = '手机访问未开启。开启后手机才能连接；不用时可以关掉。';
+        $('#pairStart').disabled = false;
+        $('#pairStop').disabled = true;
+        $('#pairCopy').disabled = true;
+        return;
+      }
+      pairData = res;
+      $('#pairStart').disabled = true;
+      $('#pairStop').disabled = false;
+      $('#pairCopy').disabled = false;
+      $('#pairInfo').textContent =
+        '地址：' + res.urls[0] + '\n访问码：' + res.code +
+        '\n手机和电脑要在同一 Wi-Fi；校园网若打不开，用手机热点让电脑连热点。';
+    } catch (e) {
+      $('#pairInfo').textContent = '读取失败。';
+    }
+  }
+  $('#pairReload').addEventListener('click', loadPair);
+  $('#pairStart').addEventListener('click', async () => {
+    const res = await api('/api/mobile/start', {});
+    if (res.ok) toast('手机访问已开启');
+    await loadPair();
+  });
+  $('#pairStop').addEventListener('click', async () => {
+    await api('/api/mobile/stop', {});
+    toast('手机访问已关闭');
+    await loadPair();
+  });
+  $('#pairCopy').addEventListener('click', async () => {
+    if (!pairData) return;
+    try {
+      await navigator.clipboard.writeText(pairData.urls[0]);
+      toast('地址已复制');
+    } catch (e) {
+      toast('复制失败，请手动输入');
+    }
+  });
+  loadPair();
+
+  $('#exportToday').addEventListener('click', () => {
+    window.location.href = '/api/mobile/export-today';
+    $('#phoneFileStatus').textContent = '已请求下载今天的数据，把文件发到手机导入。';
+  });
+
+  $('#importDone').addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    try {
+      const text = await f.text();
+      const data = JSON.parse(text);
+      const res = await api('/api/mobile/import-done', data);
+      if (!res.ok) {
+        $('#phoneFileStatus').textContent = '导入失败：' + (res.error || '未知错误');
+      } else {
+        $('#phoneFileStatus').textContent =
+          '已合并：新完成 ' + res.applied + ' 项，原本已完成 ' + res.already +
+          ' 项，跳过 ' + res.skipped + ' 项。';
+        await refresh();
+      }
+    } catch (err) {
+      $('#phoneFileStatus').textContent = '导入失败：文件不是有效的 done.json';
+    }
+    e.target.value = '';
+  });
+
+  $('#dataSearch').addEventListener('input', e => {
+    const q = e.target.value.trim();
+    document.querySelectorAll('#dataList .row').forEach(row => {
+      row.style.display = !q || row.dataset.key.includes(q) ? '' : 'none';
+    });
+  });
+
+  window.addEventListener('message', e => {
+    if (e.data && e.data.type === 'cq-saved') refresh();
+  });
+
+  // 心跳
+  setInterval(() => { fetch('/api/heartbeat', { method: 'POST' }).catch(() => {}); }, 20000);
+
+  const initial = (location.hash || '').replace('#', '');
+  if (initial === 'makeup') {
+    show('data');
+    setTimeout(openMakeup, 400);
+  } else if (initial) {
+    show(initial);
+  }
+
+  refresh();
+  setInterval(refresh, 60000);
+})();
+</script>
+</body>
+</html>
